@@ -58,7 +58,7 @@ class RegisterController extends ResourceController {
           'message': 'user created failed!',
         });
     } catch (e) {
-      return Response.badRequest(body: {
+      return Response.serverError(body: {
         'status': false,
         'message': 'Email already exist!',
       });

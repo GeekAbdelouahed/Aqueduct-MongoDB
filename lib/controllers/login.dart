@@ -47,9 +47,9 @@ class LoginController extends ResourceController {
           'message': 'Email or password wrong!',
         });
     } catch (e) {
-      return Response.badRequest(body: {
+      return Response.serverError(body: {
         'status': false,
-        'message': 'Email already exist!',
+        'message': 'Login failed!',
       });
     }
   }

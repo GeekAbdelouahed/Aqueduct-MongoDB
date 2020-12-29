@@ -12,6 +12,7 @@ export 'controllers/login.dart';
 export 'controllers/register.dart';
 export 'controllers/users.dart';
 
+export 'utils/authorization.dart';
 export 'utils/constants.dart';
 export 'utils/passwod.dart';
 export 'utils/token.dart';

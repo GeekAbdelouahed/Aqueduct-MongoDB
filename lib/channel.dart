@@ -20,11 +20,14 @@ class HelloAqueductChannel extends ApplicationChannel {
   Controller get entryPoint {
     final router = Router();
 
-    router.route("/auth/login").link(() => LoginController(_db));
+    router.route('/auth/login').link(() => LoginController(_db));
 
-    router.route("/auth/register").link(() => RegisterController(_db));
+    router.route('/auth/register').link(() => RegisterController(_db));
 
-    router.route("/users/[:id]").link(() => UsersController(_db));
+    router
+        .route('/users/[:id]')
+        .linkFunction(AuthorizationUtils.verifyAuthorization)
+        .link(() => UsersController(_db));
 
     return router;
   }
