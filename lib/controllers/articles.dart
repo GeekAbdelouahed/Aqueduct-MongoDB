@@ -1,5 +1,3 @@
-import 'package:http_server/http_server.dart';
-
 import '../hello_aqueduct.dart';
 
 class ArticlesController extends ResourceController {
@@ -55,6 +53,94 @@ class ArticlesController extends ResourceController {
       return Response.serverError(body: {
         'status': false,
         'message': 'Article created failed!',
+      });
+    }
+  }
+
+  @Operation.get()
+  Future<Response> getArticles() async {
+    try {
+      final articles = await _db.collection('articles').find().toList();
+
+      if (articles != null) {
+        return Response.ok({
+          'status': true,
+          'message': 'Articles found successfully',
+          'data': articles,
+        });
+      } else
+        return Response.notFound(body: {
+          'status': false,
+          'message': 'Articles not found!',
+        });
+    } catch (e) {
+      return Response.serverError(body: {
+        'status': false,
+        'message': 'Articles not found!',
+      });
+    }
+  }
+
+  @Operation.get('id')
+  Future<Response> getArticleById(
+      @requiredBinding @Bind.path('id') String id) async {
+    try {
+      if (id?.isEmpty ?? true)
+        return Response.badRequest(body: {
+          'status': false,
+          'message': 'Article id is required!',
+        });
+
+      final article = await _db.collection('articles').findOne(
+            where.id(ObjectId.parse(id)),
+          );
+
+      if (article != null) {
+        return Response.ok({
+          'status': true,
+          'message': 'Article found successfully',
+          'data': article,
+        });
+      } else
+        return Response.notFound(body: {
+          'status': false,
+          'message': 'Article not found!',
+        });
+    } catch (e) {
+      return Response.serverError(body: {
+        'status': false,
+        'message': 'Article not found!',
+      });
+    }
+  }
+
+  @Operation.delete('id')
+  Future<Response> deleteArticle(
+      @requiredBinding @Bind.path('id') String id) async {
+    try {
+      if (id?.isEmpty ?? true)
+        return Response.badRequest(body: {
+          'status': false,
+          'message': 'Article id is required!',
+        });
+
+      await _db.collection('articles').remove(
+        {
+          '_id': ObjectId.parse(id),
+        },
+      );
+
+      await MultipartsUtils.deleteFiles(id);
+
+      return Response.ok({
+        'status': true,
+        'message': 'Article deleted successfully',
+      });
+    } catch (e) {
+      print(e);
+      return Response.serverError(body: {
+        'status': false,
+        'message': 'Article not found!',
       });
     }
   }

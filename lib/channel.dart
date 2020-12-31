@@ -33,10 +33,12 @@ class HelloAqueductChannel extends ApplicationChannel {
         .linkFunction(AuthorizationUtils.verifyAuthorization)
         .link(() => UsersController(_db));
 
-    router
-        .route('/articles/[:id]')
-        .linkFunction(AuthorizationUtils.verifyAuthorization)
-        .link(() => ArticlesController(_db));
+    router.route('/articles/[:id]').linkFunction((request) {
+      if (request.method == 'GET') {
+        return request;
+      }
+      return AuthorizationUtils.verifyAuthorization(request);
+    }).link(() => ArticlesController(_db));
 
     return router;
   }

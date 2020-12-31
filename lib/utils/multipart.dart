@@ -1,10 +1,9 @@
 import 'package:http_server/http_server.dart';
-import 'package:meta/meta.dart';
 
 import '../hello_aqueduct.dart';
 
 class MultipartsUtils {
-  MultipartsUtils({@required this.request});
+  MultipartsUtils({this.request});
 
   final Request request;
   List<HttpMultipartFormData> _mulitparts;
@@ -74,4 +73,8 @@ class MultipartsUtils {
 
     return imagesPath;
   }
+
+  static Future<void> deleteFiles(String filesFolderName) => File(
+        'public/images/articles/$filesFolderName',
+      ).delete(recursive: true);
 }
