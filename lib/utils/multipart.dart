@@ -45,20 +45,33 @@ class MultipartsUtils {
     }
   }
 
-  Future<void> saveFile(String filePath) async {
-    final multipart = _mulitparts.firstWhere(
-      (multipart) => multipart.isBinary,
+  Future<List<String>> saveFiles(String filesFolderName) async {
+    final imagesPath = <String>[];
+    await Future.any(
+      _mulitparts.where((multipart) => multipart.isBinary).map(
+        (multipart) async {
+          final content = multipart.cast<List<int>>();
+
+          final fileName = 'image${imagesPath.length}.jpg';
+
+          imagesPath.add(fileName);
+
+          final file = await File(
+            'public/images/articles/$filesFolderName/$fileName',
+          ).create(recursive: true);
+
+          final sink = file.openWrite();
+
+          await content.forEach(sink.add);
+
+          await sink.flush();
+          await sink.close();
+
+          return imagesPath;
+        },
+      ).toList(),
     );
 
-    final content = multipart.cast<List<int>>();
-
-    final sink = File(filePath).openWrite();
-
-    await content.forEach(sink.add);
-
-    await sink.flush();
-    await sink.close();
-
-    return Future.value();
+    return imagesPath;
   }
 }

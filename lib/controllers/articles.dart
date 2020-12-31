@@ -28,17 +28,15 @@ class ArticlesController extends ResourceController {
         'status': false,
         'message': 'Content is Required',
       });
-    if (!multipartsUtils.containsKey('image'))
+    /*if (!multipartsUtils.containsKey('image'))
       return Response.badRequest(body: {
         'status': false,
         'message': 'Image is Required',
-      });
+      });*/
 
     final articleId = ObjectId();
 
-    final filePath = 'public/images/article${articleId.toHexString()}.jpg';
-
-    await multipartsUtils.saveFile(filePath);
+    final imagesPath = await multipartsUtils.saveFiles(articleId.toHexString());
 
     try {
       await _db.collection('articles').insert({
@@ -46,7 +44,7 @@ class ArticlesController extends ResourceController {
         'title': await multipartsUtils.getValue('title'),
         'content': await multipartsUtils.getValue('content'),
         'user_id': await multipartsUtils.getValue('user_id'),
-        'image': filePath,
+        'images': imagesPath,
       });
 
       return Response.created('', body: {

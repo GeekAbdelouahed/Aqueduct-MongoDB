@@ -20,6 +20,10 @@ class HelloAqueductChannel extends ApplicationChannel {
   Controller get entryPoint {
     final router = Router();
 
+    router
+        .route('/files/articles/*')
+        .link(() => FileController('public/images/articles'));
+
     router.route('/auth/login').link(() => LoginController(_db));
 
     router.route('/auth/register').link(() => RegisterController(_db));
