@@ -1,6 +1,6 @@
 import 'package:http_server/http_server.dart';
 
-import '../hello_aqueduct.dart';
+import '../../hello_aqueduct.dart';
 
 class MultipartsUtils {
   MultipartsUtils({this.request});
@@ -26,6 +26,14 @@ class MultipartsUtils {
   bool containsKey(String key) {
     return _mulitparts.firstWhere(
           (multipart) => multipart.contentDisposition.parameters['name'] == key,
+          orElse: () => null,
+        ) !=
+        null;
+  }
+
+  bool containsFiles() {
+    return _mulitparts.firstWhere(
+          (multipart) => multipart.isBinary,
           orElse: () => null,
         ) !=
         null;

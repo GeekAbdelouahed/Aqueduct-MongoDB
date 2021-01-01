@@ -1,9 +1,11 @@
-import '../hello_aqueduct.dart';
+import '../../hello_aqueduct.dart';
 
 class UsersController extends ResourceController {
   UsersController(this._db);
 
   final Db _db;
+
+  final String _collection = 'users';
 
   @Operation.get('id')
   Future<Response> getUserInformation(
@@ -15,7 +17,7 @@ class UsersController extends ResourceController {
           'message': 'User id is required!',
         });
 
-      final user = await _db.collection('users').findOne(
+      final user = await _db.collection(_collection).findOne(
             where.id(ObjectId.parse(id)),
           );
 
@@ -51,7 +53,7 @@ class UsersController extends ResourceController {
           'message': 'User id is required!',
         });
 
-      await _db.collection('users').update(
+      await _db.collection(_collection).update(
         {
           '_id': ObjectId.parse(id),
         },
@@ -87,7 +89,7 @@ class UsersController extends ResourceController {
           'message': 'User id is required!',
         });
 
-      await _db.collection('users').remove(
+      await _db.collection(_collection).remove(
         {
           '_id': ObjectId.parse(id),
         },

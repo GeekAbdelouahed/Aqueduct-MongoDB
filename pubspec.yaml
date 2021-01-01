@@ -1,7 +1,7 @@
 name: hello_aqueduct
-description: An empty Aqueduct application.
+description: A blog using Aqueduct with MongoDB.
 version: 0.0.1
-author: stable|kernel <jobs@stablekernel.com>
+author: Abdelouahed Medjoudja <abdeluached@gmail.com>
 
 environment:
   sdk: ">=2.0.0 <3.0.0"

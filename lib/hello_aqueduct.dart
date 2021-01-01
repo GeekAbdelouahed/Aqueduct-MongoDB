@@ -9,13 +9,15 @@ export 'package:mongo_dart/mongo_dart.dart';
 
 export 'channel.dart';
 
-export 'controllers/articles.dart';
-export 'controllers/login.dart';
-export 'controllers/register.dart';
-export 'controllers/users.dart';
+export 'src/controllers/articles.dart';
+export 'src/controllers/categories.dart';
+export 'src/controllers/login.dart';
+export 'src/controllers/mongo.dart';
+export 'src/controllers/register.dart';
+export 'src/controllers/users.dart';
 
-export 'utils/authorization.dart';
-export 'utils/constants.dart';
-export 'utils/multipart.dart';
-export 'utils/passwod.dart';
-export 'utils/token.dart';
+export 'src/utils/authorization.dart';
+export 'src/utils/constants.dart';
+export 'src/utils/multipart.dart';
+export 'src/utils/passwod.dart';
+export 'src/utils/token.dart';

@@ -1,9 +1,11 @@
-import '../hello_aqueduct.dart';
+import '../../hello_aqueduct.dart';
 
 class RegisterController extends ResourceController {
   RegisterController(this._db);
 
   final Db _db;
+
+  final String _collection = 'users';
 
   @Operation.post()
   Future<Response> register(@Bind.body() Map<String, dynamic> user) async {
@@ -36,7 +38,7 @@ class RegisterController extends ResourceController {
     ]);
 
     try {
-      final createdUser = await _db.collection('users').insert({
+      final createdUser = await _db.collection(_collection).insert({
         'first_name': user['first_name'],
         'last_name': user['last_name'],
         'email': user['email'],

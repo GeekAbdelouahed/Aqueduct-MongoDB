@@ -1,4 +1,4 @@
-import '../hello_aqueduct.dart';
+import '../../hello_aqueduct.dart';
 
 abstract class AuthorizationUtils {
   static Future<RequestOrResponse> verifyAuthorization(Request request) async {

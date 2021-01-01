@@ -1,9 +1,11 @@
-import '../hello_aqueduct.dart';
+import '../../hello_aqueduct.dart';
 
 class LoginController extends ResourceController {
   LoginController(this._db);
 
   final Db _db;
+
+  final String _collection = 'users';
 
   @Operation.post()
   Future<Response> login(@Bind.body() Map<String, dynamic> user) async {
@@ -19,7 +21,7 @@ class LoginController extends ResourceController {
       });
 
     try {
-      final oldUser = await _db.collection('users').findOne({
+      final oldUser = await _db.collection(_collection).findOne({
         'email': user['email'],
       });
 

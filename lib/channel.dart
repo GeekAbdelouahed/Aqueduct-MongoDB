@@ -1,19 +1,18 @@
 import 'hello_aqueduct.dart';
 
 class HelloAqueductChannel extends ApplicationChannel {
-  Db _db;
+  final _mongoDBController = MongoDBController();
 
   @override
   Future prepare() async {
     logger.onRecord.listen(
-        (rec) => print("$rec ${rec.error ?? ""} ${rec.stackTrace ?? ""}"));
-
-    _db = Db("mongodb://localhost:27017/Blog");
-    await _db.open();
-    await _db.collection('users').createIndex(
-      keys: {"email": 1},
-      unique: true,
+      (rec) => print('$rec ${rec.error ?? ''} ${rec.stackTrace ?? ''}'),
     );
+
+    await _mongoDBController.open();
+    await _mongoDBController.initIndex();
+
+    return Future.value();
   }
 
   @override
@@ -24,28 +23,52 @@ class HelloAqueductChannel extends ApplicationChannel {
         .route('/files/articles/*')
         .link(() => FileController('public/images/articles'));
 
-    router.route('/auth/login').link(() => LoginController(_db));
+    router
+        .route('/auth/login')
+        .link(() => LoginController(_mongoDBController.db));
 
-    router.route('/auth/register').link(() => RegisterController(_db));
+    router
+        .route('/auth/register')
+        .link(() => RegisterController(_mongoDBController.db));
 
     router
         .route('/users/[:id]')
         .linkFunction(AuthorizationUtils.verifyAuthorization)
-        .link(() => UsersController(_db));
+        .link(() => UsersController(_mongoDBController.db));
+
+    router.route('/categories/[:id]').linkFunction((request) {
+      switch (request.method) {
+        case 'GET':
+          return request;
+        default:
+          return AuthorizationUtils.verifyAuthorization(request);
+      }
+    }).link(() => CategoriesController(_mongoDBController.db));
 
     router.route('/articles/[:id]').linkFunction((request) {
-      if (request.method == 'GET') {
-        return request;
+      switch (request.method) {
+        case 'GET':
+          return request;
+        default:
+          return AuthorizationUtils.verifyAuthorization(request);
       }
-      return AuthorizationUtils.verifyAuthorization(request);
-    }).link(() => ArticlesController(_db));
+    }).link(() => ArticlesController(_mongoDBController.db));
+
+    router.route('/articles/byCategory/[:categoryId]').linkFunction((request) {
+      switch (request.method) {
+        case 'GET':
+          return request;
+        default:
+          return AuthorizationUtils.verifyAuthorization(request);
+      }
+    }).link(() => ArticlesController(_mongoDBController.db));
 
     return router;
   }
 
   @override
-  Future close() {
-    _db.close();
+  Future close() async {
+    await _mongoDBController.close();
     return super.close();
   }
 }

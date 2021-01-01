@@ -1,4 +1,4 @@
-import '../hello_aqueduct.dart';
+import '../../hello_aqueduct.dart';
 
 class ArticlesController extends ResourceController {
   ArticlesController(this._db) {
@@ -6,8 +6,10 @@ class ArticlesController extends ResourceController {
   }
   final Db _db;
 
+  final String _collection = 'articles';
+
   @Operation.post()
-  Future<Response> create() async {
+  Future<Response> createArticle() async {
     final multipartsUtils = MultipartsUtils(request: request);
     await multipartsUtils.parse();
 
@@ -26,22 +28,23 @@ class ArticlesController extends ResourceController {
         'status': false,
         'message': 'Content is Required',
       });
-    /*if (!multipartsUtils.containsKey('image'))
+    if (!multipartsUtils.containsFiles())
       return Response.badRequest(body: {
         'status': false,
         'message': 'Image is Required',
-      });*/
+      });
 
     final articleId = ObjectId();
 
     final imagesPath = await multipartsUtils.saveFiles(articleId.toHexString());
 
     try {
-      await _db.collection('articles').insert({
+      await _db.collection(_collection).insert({
         '_id': articleId,
         'title': await multipartsUtils.getValue('title'),
         'content': await multipartsUtils.getValue('content'),
         'user_id': await multipartsUtils.getValue('user_id'),
+        'category_id': await multipartsUtils.getValue('category_id'),
         'images': imagesPath,
       });
 
@@ -58,9 +61,15 @@ class ArticlesController extends ResourceController {
   }
 
   @Operation.get()
-  Future<Response> getArticles() async {
+  Future<Response> getArticles({@Bind.query('query') String query}) async {
     try {
-      final articles = await _db.collection('articles').find().toList();
+      final selector = query?.isNotEmpty ?? false
+          ? where.match('title', query,
+              caseInsensitive: true) // Search by title
+          : null;
+
+      final articles =
+          await _db.collection(_collection).find(selector).toList();
 
       if (articles != null) {
         return Response.ok({
@@ -91,7 +100,7 @@ class ArticlesController extends ResourceController {
           'message': 'Article id is required!',
         });
 
-      final article = await _db.collection('articles').findOne(
+      final article = await _db.collection(_collection).findOne(
             where.id(ObjectId.parse(id)),
           );
 
@@ -114,6 +123,40 @@ class ArticlesController extends ResourceController {
     }
   }
 
+  @Operation.get('categoryId')
+  Future<Response> getArticleByCategory(
+      @requiredBinding @Bind.path('categoryId') String categoryId) async {
+    try {
+      if (categoryId?.isEmpty ?? true)
+        return Response.badRequest(body: {
+          'status': false,
+          'message': 'Category id is required!',
+        });
+
+      final article = await _db.collection(_collection).find(
+        {'category_id': categoryId},
+      ).toList();
+
+      if (article != null) {
+        return Response.ok({
+          'status': true,
+          'message': 'Articles found successfully',
+          'data': article,
+        });
+      } else
+        return Response.notFound(body: {
+          'status': false,
+          'message': 'Articles not found!',
+        });
+    } catch (e) {
+      print(e);
+      return Response.serverError(body: {
+        'status': false,
+        'message': 'Articles not found!',
+      });
+    }
+  }
+
   @Operation.delete('id')
   Future<Response> deleteArticle(
       @requiredBinding @Bind.path('id') String id) async {
@@ -124,7 +167,7 @@ class ArticlesController extends ResourceController {
           'message': 'Article id is required!',
         });
 
-      await _db.collection('articles').remove(
+      await _db.collection(_collection).remove(
         {
           '_id': ObjectId.parse(id),
         },

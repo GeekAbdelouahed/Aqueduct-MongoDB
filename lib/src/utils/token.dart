@@ -2,15 +2,14 @@ import 'dart:math';
 
 import 'package:jaguar_jwt/jaguar_jwt.dart';
 
-import '../hello_aqueduct.dart';
+import '../../hello_aqueduct.dart';
 
 abstract class TokenUtils {
   static bool isTokenValid(String token) {
     try {
-      final jwtClaim = verifyJwtHS256Signature(token, Constants.JWT_KEY);
+      final jwtClaim = verifyJwtHS256Signature(token, Constants.jwtKey);
 
-      final isExpired =
-          jwtClaim != null && jwtClaim.expiry.isAfter(DateTime.now());
+      final isExpired = jwtClaim?.expiry?.isAfter(DateTime.now()) ?? false;
 
       return isExpired;
     } catch (e) {
@@ -25,7 +24,7 @@ abstract class TokenUtils {
       jwtId: _randomString(32),
       maxAge: const Duration(days: 360),
     );
-    return issueJwtHS256(claimSet, Constants.JWT_KEY);
+    return issueJwtHS256(claimSet, Constants.jwtKey);
   }
 
   static String _randomString(int length) {
