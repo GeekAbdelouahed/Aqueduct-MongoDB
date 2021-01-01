@@ -3,7 +3,7 @@ import 'dart:math';
 
 import 'package:crypto/crypto.dart';
 
-mixin PasswordUtils {
+abstract class PasswordUtils {
   static bool isPasswordValid(
       String givenPassword, String salt, String hashedPassword) {
     final newHashedPassword = hashPassword(givenPassword, salt);

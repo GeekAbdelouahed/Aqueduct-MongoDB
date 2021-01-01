@@ -1,6 +1,6 @@
 import '../hello_aqueduct.dart';
 
-class AuthorizationUtils {
+abstract class AuthorizationUtils {
   static Future<RequestOrResponse> verifyAuthorization(Request request) async {
     final token = request.raw.headers.value('Authorization');
 

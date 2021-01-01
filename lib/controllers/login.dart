@@ -35,13 +35,17 @@ class LoginController extends ResourceController {
         oldUser['password'] as String,
       );
 
-      if (isPasswordValid)
+      if (isPasswordValid) {
+        final token = TokenUtils.generatToken(
+          [user['email'] as String],
+        );
+
         return Response.ok({
           'status': true,
           'message': 'login successfully',
-          'token': oldUser['token'],
+          'token': token,
         });
-      else
+      } else
         return Response.unauthorized(body: {
           'status': false,
           'message': 'Email or password wrong!',

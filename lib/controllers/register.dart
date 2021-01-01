@@ -32,8 +32,6 @@ class RegisterController extends ResourceController {
     final hashedPassword =
         PasswordUtils.hashPassword('${user['password']}', salt);
     final token = TokenUtils.generatToken([
-      user['first_name'] as String,
-      user['last_name'] as String,
       user['email'] as String,
     ]);
 
@@ -44,7 +42,6 @@ class RegisterController extends ResourceController {
         'email': user['email'],
         'password': hashedPassword,
         'salt': salt,
-        'token': token,
       });
       if (createdUser != null)
         return Response.created('', body: {
