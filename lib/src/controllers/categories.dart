@@ -18,6 +18,7 @@ class CategoriesController extends ResourceController {
     try {
       final createdCategory = await _db.collection(_collection).insert({
         'name': category['name'],
+        'created_at': DateTime.now().toString(),
       });
       if (createdCategory != null)
         return Response.created('', body: {

@@ -44,6 +44,7 @@ class RegisterController extends ResourceController {
         'email': user['email'],
         'password': hashedPassword,
         'salt': salt,
+        'created_at': DateTime.now().toString(),
       });
       if (createdUser != null)
         return Response.created('', body: {

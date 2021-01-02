@@ -25,6 +25,7 @@ class FavoritesController extends ResourceController {
       final createdFavorite = await _db.collection(_collection).insert({
         'user_id': ObjectId.parse(favorite['user_id'] as String),
         'article_id': ObjectId.parse(favorite['article_id'] as String),
+        'created_at': DateTime.now().toString(),
       });
       if (createdFavorite != null)
         return Response.created('', body: {

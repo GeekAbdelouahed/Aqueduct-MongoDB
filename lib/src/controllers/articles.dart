@@ -47,6 +47,7 @@ class ArticlesController extends ResourceController {
         'category_id':
             ObjectId.parse(await multipartsUtils.getValue('category_id')),
         'images': imagesPath,
+        'created_at': DateTime.now().toString(),
       });
 
       return Response.created('', body: {

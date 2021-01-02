@@ -17,12 +17,24 @@ class UsersController extends ResourceController {
           'message': 'User id is required!',
         });
 
-      final user = await _db.collection(_collection).findOne(
-            where.id(ObjectId.parse(id)),
-          );
+      final pipeline = AggregationPipelineBuilder()
+          .addStage(Match(
+            where.id(ObjectId.parse(id)).map['\$query'],
+          ))
+          .addStage(Project({
+            'password': 0,
+            'salt': 0,
+            'created_at': 0,
+            'updated_at': 0,
+          }))
+          .build();
+
+      final user = await _db
+          .collection(_collection)
+          .aggregateToStream(pipeline)
+          .toList();
 
       if (user != null) {
-        user..remove('password')..remove('salt');
         return Response.ok({
           'status': true,
           'message': 'User found successfully',
@@ -62,6 +74,7 @@ class UsersController extends ResourceController {
             'first_name': user['first_name'],
             'last_name': user['last_name'],
             'email': user['email'],
+            'updated_at': DateTime.now().toString(),
           }
         },
       );
