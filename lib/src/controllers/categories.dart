@@ -63,11 +63,11 @@ class CategoriesController extends ResourceController {
     }
   }
 
-  @Operation.delete('id')
+  @Operation.delete()
   Future<Response> deleteCategory(
-      @requiredBinding @Bind.path('id') String id) async {
+      @Bind.body() Map<String, dynamic> category) async {
     try {
-      if (id?.isEmpty ?? true)
+      if (!category.containsKey('category_id'))
         return Response.badRequest(body: {
           'status': false,
           'message': 'Category id is required!',
@@ -75,7 +75,7 @@ class CategoriesController extends ResourceController {
 
       await _db.collection(_collection).remove(
         {
-          '_id': ObjectId.parse(id),
+          '_id': ObjectId.parse(category['category_id'] as String),
         },
       );
 

@@ -11,6 +11,7 @@ export 'channel.dart';
 
 export 'src/controllers/articles.dart';
 export 'src/controllers/categories.dart';
+export 'src/controllers/favorites.dart';
 export 'src/controllers/login.dart';
 export 'src/controllers/mongo.dart';
 export 'src/controllers/register.dart';

@@ -43,8 +43,9 @@ class ArticlesController extends ResourceController {
         '_id': articleId,
         'title': await multipartsUtils.getValue('title'),
         'content': await multipartsUtils.getValue('content'),
-        'user_id': await multipartsUtils.getValue('user_id'),
-        'category_id': await multipartsUtils.getValue('category_id'),
+        'user_id': ObjectId.parse(await multipartsUtils.getValue('user_id')),
+        'category_id':
+            ObjectId.parse(await multipartsUtils.getValue('category_id')),
         'images': imagesPath,
       });
 
@@ -134,7 +135,7 @@ class ArticlesController extends ResourceController {
         });
 
       final article = await _db.collection(_collection).find(
-        {'category_id': categoryId},
+        {'category_id': ObjectId.parse(categoryId)},
       ).toList();
 
       if (article != null) {
@@ -157,11 +158,11 @@ class ArticlesController extends ResourceController {
     }
   }
 
-  @Operation.delete('id')
+  @Operation.delete()
   Future<Response> deleteArticle(
-      @requiredBinding @Bind.path('id') String id) async {
+      @Bind.body() Map<String, dynamic> article) async {
     try {
-      if (id?.isEmpty ?? true)
+      if (!article.containsKey('article_id'))
         return Response.badRequest(body: {
           'status': false,
           'message': 'Article id is required!',
@@ -169,11 +170,11 @@ class ArticlesController extends ResourceController {
 
       await _db.collection(_collection).remove(
         {
-          '_id': ObjectId.parse(id),
+          '_id': ObjectId.parse(article['article_id'] as String),
         },
       );
 
-      await MultipartsUtils.deleteFiles(id);
+      await MultipartsUtils.deleteFiles(article['article_id'] as String);
 
       return Response.ok({
         'status': true,

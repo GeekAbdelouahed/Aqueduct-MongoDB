@@ -23,8 +23,8 @@ class FavoritesController extends ResourceController {
 
     try {
       final createdFavorite = await _db.collection(_collection).insert({
-        'user_id': favorite['user_id'],
-        'category_id': favorite['category_id'],
+        'user_id': ObjectId.parse(favorite['user_id'] as String),
+        'article_id': ObjectId.parse(favorite['article_id'] as String),
       });
       if (createdFavorite != null)
         return Response.created('', body: {
@@ -45,10 +45,28 @@ class FavoritesController extends ResourceController {
     }
   }
 
-  @Operation.get()
-  Future<Response> getFavorites() async {
+  @Operation.get('userId')
+  Future<Response> getFavorites(@Bind.path('userId') String userId) async {
     try {
-      final favorites = await _db.collection(_collection).find().toList();
+      final pipeline = AggregationPipelineBuilder()
+          .addStage(Match(
+            where.eq('user_id', ObjectId.parse(userId)).map['\$query'],
+          ))
+          .addStage(Lookup(
+            from: 'articles',
+            localField: 'article_id',
+            foreignField: '_id',
+            as: 'article',
+          ))
+          .addStage(Project({
+            'article': 1,
+          }))
+          .build();
+
+      final favorites = await _db
+          .collection(_collection)
+          .aggregateToStream(pipeline)
+          .toList();
 
       if (favorites != null) {
         return Response.ok({
@@ -70,11 +88,11 @@ class FavoritesController extends ResourceController {
     }
   }
 
-  @Operation.delete('id')
-  Future<Response> deleteCategory(
-      @requiredBinding @Bind.path('id') String id) async {
+  @Operation.delete()
+  Future<Response> deleteFavorite(
+      @Bind.body() Map<String, dynamic> body) async {
     try {
-      if (id?.isEmpty ?? true)
+      if (!body.containsKey('favorite_id'))
         return Response.badRequest(body: {
           'status': false,
           'message': 'Favorite id is required!',
@@ -82,7 +100,7 @@ class FavoritesController extends ResourceController {
 
       await _db.collection(_collection).remove(
         {
-          '_id': ObjectId.parse(id),
+          '_id': ObjectId.parse(body['favorite_id'] as String),
         },
       );
 

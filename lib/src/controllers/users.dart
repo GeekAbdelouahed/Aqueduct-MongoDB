@@ -78,12 +78,11 @@ class UsersController extends ResourceController {
     }
   }
 
-  @Operation.delete('id')
+  @Operation.delete()
   Future<Response> deleteUserInformation(
-    @requiredBinding @Bind.path('id') String id,
-  ) async {
+      @Bind.body() Map<String, dynamic> user) async {
     try {
-      if (id?.isEmpty ?? true)
+      if (!user.containsKey('user_id'))
         return Response.badRequest(body: {
           'status': false,
           'message': 'User id is required!',
@@ -91,7 +90,7 @@ class UsersController extends ResourceController {
 
       await _db.collection(_collection).remove(
         {
-          '_id': ObjectId.parse(id),
+          '_id': ObjectId.parse(user['user_id'] as String),
         },
       );
 
