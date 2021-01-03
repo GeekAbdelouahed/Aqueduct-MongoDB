@@ -1,11 +1,15 @@
 import '../../hello_aqueduct.dart';
 
 class MongoDBController {
-  final _db = Db(Constants.host);
+  Db _db;
 
   Db get db => _db;
 
-  Future<void> open() => _db.open();
+  Future<void> open() async {
+    _db = await Db.create(Constants.host);
+    await _db.open();
+    return Future.value();
+  }
 
   Future<void> initIndex() => Future.any(
         [
