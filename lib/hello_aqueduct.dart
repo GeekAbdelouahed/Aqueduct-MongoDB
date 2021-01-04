@@ -9,6 +9,8 @@ export 'package:mongo_dart/mongo_dart.dart';
 
 export 'channel.dart';
 
+export 'host.dart';
+
 export 'src/controllers/articles.dart';
 export 'src/controllers/categories.dart';
 export 'src/controllers/favorites.dart';
