@@ -59,9 +59,15 @@ class FavoritesController extends ResourceController {
             foreignField: '_id',
             as: 'article',
           ))
-          .addStage(Project({
-            'article': 1,
-          }))
+          .addStage(Project(
+            {
+              'article': 1,
+            },
+          ))
+          .addStage(Unwind(
+            const Field('article'),
+            preserveNullAndEmptyArrays: true,
+          ))
           .build();
 
       final favorites = await _db

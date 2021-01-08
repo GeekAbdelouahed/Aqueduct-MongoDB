@@ -6,7 +6,7 @@ class MongoDBController {
   Db get db => _db;
 
   Future<void> open() async {
-    _db = await Db.create(Constants.host);
+    _db = await Db.create(host);
     await _db.open();
     return Future.value();
   }
