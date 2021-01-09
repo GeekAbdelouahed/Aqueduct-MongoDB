@@ -94,7 +94,9 @@ class ArticlesController extends ResourceController {
 
   @Operation.get('id')
   Future<Response> getArticleById(
-      @requiredBinding @Bind.path('id') String id) async {
+    @requiredBinding @Bind.path('id') String id, {
+    @Bind.query('userId') String userId,
+  }) async {
     try {
       if (id?.isEmpty ?? true)
         return Response.badRequest(body: {
@@ -102,15 +104,51 @@ class ArticlesController extends ResourceController {
           'message': 'Article id is required!',
         });
 
-      final article = await _db.collection(_collection).findOne(
-            where.id(ObjectId.parse(id)),
-          );
+      final pipeline = AggregationPipelineBuilder()
+          .addStage(Match(
+            where.id(ObjectId.parse(id)).map['\$query'],
+          ))
+          .addStage(Lookup.withPipeline(
+            from: 'favorites',
+            let: {},
+            pipeline: [
+              Match(
+                where
+                    .eq(
+                      'user_id',
+                      userId != null ? ObjectId.parse(userId) : null,
+                    )
+                    .map['\$query'],
+              ),
+              Match(
+                where.eq('article_id', ObjectId.parse(id)).map['\$query'],
+              ),
+            ],
+            as: 'isFavorite',
+          ))
+          .addStage(Project(
+            {
+              'title': 1,
+              'content': 1,
+              'images': 1,
+              'created_at': 1,
+              'user_id': 1,
+              'category_id': 1,
+              'isFavorite': Gt(Size('\$isFavorite'), 0),
+            },
+          ))
+          .build();
+
+      final article = await _db
+          .collection(_collection)
+          .aggregateToStream(pipeline)
+          .toList();
 
       if (article != null) {
         return Response.ok({
           'status': true,
           'message': 'Article found successfully',
-          'data': article,
+          'data': article.first,
         });
       } else
         return Response.notFound(body: {
@@ -118,6 +156,7 @@ class ArticlesController extends ResourceController {
           'message': 'Article not found!',
         });
     } catch (e) {
+      print(e);
       return Response.serverError(body: {
         'status': false,
         'message': 'Article not found!',
