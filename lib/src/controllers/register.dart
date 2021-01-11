@@ -46,13 +46,19 @@ class RegisterController extends ResourceController {
         'salt': salt,
         'created_at': DateTime.now().toString(),
       });
-      if (createdUser != null)
+      if (createdUser != null) {
+        final lastUser = await _db.collection(_collection).find({
+          'email': user['email'],
+        }).last;
         return Response.created('', body: {
           'status': true,
           'message': 'user created successfully',
-          'token': token,
+          'data': {
+            '_id': lastUser['_id'],
+            'token': token,
+          }
         });
-      else
+      } else
         return Response.serverError(body: {
           'status': false,
           'message': 'user created failed!',

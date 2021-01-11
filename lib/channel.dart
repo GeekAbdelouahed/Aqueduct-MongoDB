@@ -64,6 +64,11 @@ class HelloAqueductChannel extends ApplicationChannel {
     }).link(() => ArticlesController(_mongoDBController.db));
 
     router
+        .route('/articles/byUser/[:userId]')
+        //.linkFunction(AuthorizationUtils.verifyAuthorization)
+        .link(() => ArticlesController(_mongoDBController.db));
+
+    router
         .route('/favorites/[:userId]')
         .linkFunction(AuthorizationUtils.verifyAuthorization)
         .link(() => FavoritesController(_mongoDBController.db));

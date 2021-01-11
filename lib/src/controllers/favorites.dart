@@ -99,15 +99,22 @@ class FavoritesController extends ResourceController {
   Future<Response> deleteFavorite(
       @Bind.body() Map<String, dynamic> body) async {
     try {
-      if (!body.containsKey('favorite_id'))
+      if (!body.containsKey('article_id'))
         return Response.badRequest(body: {
           'status': false,
-          'message': 'Favorite id is required!',
+          'message': 'Article id is required!',
+        });
+
+      if (!body.containsKey('user_id'))
+        return Response.badRequest(body: {
+          'status': false,
+          'message': 'User id is required!',
         });
 
       await _db.collection(_collection).remove(
         {
-          '_id': ObjectId.parse(body['favorite_id'] as String),
+          'article_id': ObjectId.parse(body['article_id'] as String),
+          'user_id': ObjectId.parse(body['user_id'] as String),
         },
       );
 

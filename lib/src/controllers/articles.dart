@@ -198,6 +198,40 @@ class ArticlesController extends ResourceController {
     }
   }
 
+  @Operation.get('userId')
+  Future<Response> getArticleByUser(
+      @requiredBinding @Bind.path('userId') String userId) async {
+    try {
+      if (userId?.isEmpty ?? true)
+        return Response.badRequest(body: {
+          'status': false,
+          'message': 'User id is required!',
+        });
+
+      final article = await _db.collection(_collection).find(
+        {'user_id': ObjectId.parse(userId)},
+      ).toList();
+
+      if (article != null) {
+        return Response.ok({
+          'status': true,
+          'message': 'Articles found successfully',
+          'data': article,
+        });
+      } else
+        return Response.notFound(body: {
+          'status': false,
+          'message': 'Articles not found!',
+        });
+    } catch (e) {
+      print(e);
+      return Response.serverError(body: {
+        'status': false,
+        'message': 'Articles not found!',
+      });
+    }
+  }
+
   @Operation.delete()
   Future<Response> deleteArticle(
       @Bind.body() Map<String, dynamic> article) async {

@@ -21,11 +21,11 @@ class LoginController extends ResourceController {
       });
 
     try {
-      final oldUser = await _db.collection(_collection).findOne({
+      final savedUser = await _db.collection(_collection).findOne({
         'email': user['email'],
       });
 
-      if (oldUser == null)
+      if (savedUser == null)
         return Response.notFound(body: {
           'status': false,
           'message': 'User not found!',
@@ -33,8 +33,8 @@ class LoginController extends ResourceController {
 
       final isPasswordValid = PasswordUtils.isPasswordValid(
         user['password'] as String,
-        oldUser['salt'] as String,
-        oldUser['password'] as String,
+        savedUser['salt'] as String,
+        savedUser['password'] as String,
       );
 
       if (isPasswordValid) {
@@ -45,7 +45,10 @@ class LoginController extends ResourceController {
         return Response.ok({
           'status': true,
           'message': 'login successfully',
-          'token': token,
+          'data': {
+            '_id': savedUser['_id'],
+            'token': token,
+          }
         });
       } else
         return Response.unauthorized(body: {
