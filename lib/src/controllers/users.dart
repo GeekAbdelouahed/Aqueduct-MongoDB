@@ -38,7 +38,7 @@ class UsersController extends ResourceController {
         return Response.ok({
           'status': true,
           'message': 'User found successfully',
-          'data': user,
+          'data': user.first,
         });
       } else
         return Response.notFound(body: {
