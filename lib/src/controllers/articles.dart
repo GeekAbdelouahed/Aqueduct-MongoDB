@@ -8,6 +8,7 @@ class ArticlesController extends ResourceController {
 
   final String _collection = 'articles';
 
+  // TODO support emoji content
   @Operation.post()
   Future<Response> createArticle() async {
     final multipartsUtils = MultipartsUtils(request: request);
@@ -18,6 +19,7 @@ class ArticlesController extends ResourceController {
         'status': false,
         'message': 'User id is Required',
       });
+
     if (!multipartsUtils.containsKey('title'))
       return Response.badRequest(body: {
         'status': false,
@@ -43,9 +45,14 @@ class ArticlesController extends ResourceController {
         '_id': articleId,
         'title': await multipartsUtils.getValue('title'),
         'content': await multipartsUtils.getValue('content'),
-        'user_id': ObjectId.parse(await multipartsUtils.getValue('user_id')),
-        'category_id':
-            ObjectId.parse(await multipartsUtils.getValue('category_id')),
+        'user_id': ObjectId.parse(
+          await multipartsUtils.getValue('user_id'),
+        ),
+        'category_id': multipartsUtils.containsKey('category_id')
+            ? ObjectId.parse(
+                await multipartsUtils.getValue('category_id'),
+              )
+            : null,
         'images': imagesPath,
         'created_at': DateTime.now().toString(),
       });
@@ -55,6 +62,7 @@ class ArticlesController extends ResourceController {
         'message': 'Article created successfully',
       });
     } catch (e) {
+      print(e);
       return Response.serverError(body: {
         'status': false,
         'message': 'Article created failed!',
@@ -65,10 +73,15 @@ class ArticlesController extends ResourceController {
   @Operation.get()
   Future<Response> getArticles({@Bind.query('query') String query}) async {
     try {
-      final selector = query?.isNotEmpty ?? false
-          ? where.match('title', query,
-              caseInsensitive: true) // Search by title
-          : null;
+      final selector = where.sortBy('created_at', descending: true);
+
+      // Search by title
+      if (query?.isNotEmpty ?? false)
+        selector.match(
+          'title',
+          query,
+          caseInsensitive: true,
+        );
 
       final articles =
           await _db.collection(_collection).find(selector).toList();
