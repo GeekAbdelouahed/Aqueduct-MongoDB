@@ -1,4 +1,4 @@
-# hello_aqueduct
+# A Blog API built by Dart + Aqueduct framework + MongoDB
 
 ## Running the Application Locally
 
