@@ -65,7 +65,7 @@ class HelloAqueductChannel extends ApplicationChannel {
 
     router
         .route('/articles/byUser/[:userId]')
-        //.linkFunction(AuthorizationUtils.verifyAuthorization)
+        .linkFunction(AuthorizationUtils.verifyAuthorization)
         .link(() => ArticlesController(_mongoDBController.db));
 
     router
