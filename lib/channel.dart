@@ -1,7 +1,7 @@
 import 'hello_aqueduct.dart';
 
 class HelloAqueductChannel extends ApplicationChannel {
-  final _mongoDBController = MongoDBController();
+  final _mongoDBController = MongoDBService();
 
   @override
   Future prepare() async {

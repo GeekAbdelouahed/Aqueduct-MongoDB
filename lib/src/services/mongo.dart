@@ -1,6 +1,6 @@
 import '../../hello_aqueduct.dart';
 
-class MongoDBController {
+class MongoDBService {
   Db _db;
 
   Db get db => _db;
