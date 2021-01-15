@@ -15,9 +15,9 @@ export 'src/controllers/articles.dart';
 export 'src/controllers/categories.dart';
 export 'src/controllers/favorites.dart';
 export 'src/controllers/login.dart';
-export 'src/services/mongo.dart';
 export 'src/controllers/register.dart';
 export 'src/controllers/users.dart';
+export 'src/services/mongo.dart';
 
 export 'src/utils/authorization.dart';
 export 'src/utils/constants.dart';
