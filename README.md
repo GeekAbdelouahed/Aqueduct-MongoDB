@@ -1,4 +1,4 @@
-# A Blog API built by Dart + Aqueduct framework + MongoDB
+# A Blog API built by Dart with Aqueduct framework + MongoDB
 
 ### [Frontend code](https://github.com/GeekAbdelouahed/Flutter-Blog)
 
